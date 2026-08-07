@@ -1,0 +1,23 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.token.admin == true;
+    }
+
+    // Fix #5: CNIC / license / vehicle documents are sensitive government
+    // ID data. No public read, ever — admins view them only through
+    // getSignedDocumentUrl(), which mints a 5-minute URL on demand.
+    match /driver-documents/{driverId}/{fileName} {
+      allow read: if false;   // deliberately blocked — use the callable function
+      allow write: if false;  // drivers upload via the driver app's own rules, not here
+    }
+
+    match /profile-images/{userId}/{fileName} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+  }
+}
