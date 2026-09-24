@@ -41,7 +41,7 @@ export function Sidebar() {
       >
         Share<Box component="span" sx={{ color: color.brand }}>Drive</Box>
         <Typography component="span" sx={{ display: 'block', fontSize: 11, color: color.textSecondary, fontFamily: font.body, fontWeight: 400 }}>
-          ADMIN
+          ADMIN PANEL
         </Typography>
       </Typography>
 

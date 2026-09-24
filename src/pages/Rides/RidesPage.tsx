@@ -12,6 +12,19 @@ import type { Ride } from '@/types/models';
 
 type Filter = 'all' | 'requested' | 'accepted' | 'started' | 'in_progress' | 'completed' | 'cancelled';
 
+function formatRideDate(value: unknown): string {
+  if (!value) return '—';
+  let date: Date | null = null;
+  if (typeof value === 'object' && value !== null && 'toDate' in value) {
+    date = (value as { toDate: () => Date }).toDate();
+  } else if (value instanceof Date) {
+    date = value;
+  }
+  if (!date) return '—';
+  return date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+    + ' ' + date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+}
+
 export function RidesPage() {
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -51,6 +64,7 @@ export function RidesPage() {
               <TableCell>Driver</TableCell>
               <TableCell>Route</TableCell>
               <TableCell>Vehicle</TableCell>
+              <TableCell>Date</TableCell>
               <TableCell>Fare</TableCell>
               <TableCell>Status</TableCell>
             </TableRow>
@@ -58,7 +72,7 @@ export function RidesPage() {
           <TableBody>
             {!loading && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} sx={{ textAlign: 'center', py: 4, color: color.textSecondary }}>
+                <TableCell colSpan={7} sx={{ textAlign: 'center', py: 4, color: color.textSecondary }}>
                   No rides found.
                 </TableCell>
               </TableRow>
@@ -71,6 +85,7 @@ export function RidesPage() {
                   {r.origin ?? '?'} → {r.destination ?? '?'}
                 </TableCell>
                 <TableCell sx={{ textTransform: 'capitalize' }}>{r.rideName ?? '—'}</TableCell>
+                <TableCell sx={{ fontSize: 13, color: color.textSecondary }}>{formatRideDate(r.createdAt)}</TableCell>
                 <TableCell sx={{ fontFamily: font.mono }}>Rs {r.fare ?? 0}</TableCell>
                 <TableCell><StatusChip status={r.status ?? 'unknown'} /></TableCell>
               </TableRow>
